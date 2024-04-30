@@ -30,7 +30,7 @@ Enjoy coding with SnippetBot!
 
 To start the bot, simply run the `main.py` file. Make sure you have Python and the required libraries installed.
 
-`bash
-python main.py`
+```bash
+python main.py
 
 
