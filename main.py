@@ -13,15 +13,11 @@ client = discord.Client(intents=intents) #don´t touch
 
 
 mydb = mysql.connector.connect(
-    host="localhost", #your host or IP addresse
+    host="", #your host or IP addresse
     user="", #your database username
     password="", #your database password
     database="snippetbot" #import snippetbot.sql DONT TOUCH
 )
-
-serverid = "", #your discord server id
-adminrole =     #role id for use the bot must be a number
-
 
 
 ##### events #####
@@ -44,8 +40,10 @@ async def on_message(message):
                 code = (parts[3])
                 cursor = mydb.cursor()
 
-                sql = "INSERT INTO snippetbot (name, code_lang, code) VALUES (%s, %s, %s)"
+                sql = "INSERT INTO snippets (name, code_lang, code) VALUES (%s, %s, %s)"
                 val = (name,code_lang,code)
+                cursor.execute(sql, val)
+                mydb.commit()
                 embed = discord.Embed(title="succes", description="your code was created", color=0x00ff00)
                 formatted_code = f"```{code_lang}\n{code}\n```"
                 embed.add_field(name=name, value=formatted_code, inline=False)
@@ -64,7 +62,7 @@ async def on_message(message):
                 name = (parts[1])
                 cursor = mydb.cursor()
 
-                sql = "SELECT code_lang, code FROM snippetbot WHERE name = %s"
+                sql = "SELECT code_lang, code FROM snippets WHERE name = %s"
                 val = (name,)
                 cursor.execute(sql, val)
                 result = cursor.fetchone()
@@ -83,6 +81,32 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
         else:
             embed = discord.Embed(title="error", description="you need <name>", color=0xff0000)
+            await message.channel.send(embed=embed)
+
+
+    if message.content.startswith(f'{praefix}delete'):  # !delete <name>
+        parts = message.content.split()
+        if len(parts) == 2:
+            try:
+                name = (parts[1])
+                cursor = mydb.cursor()
+
+                sql = "DELETE FROM snippets WHERE name = %s"
+                val = (name,)
+                cursor.execute(sql, val)
+                mydb.commit()
+
+                if cursor.rowcount == 0:
+                    embed = discord.Embed(title="error", description="snippet not found", color=0xff0000)
+                else:
+                    embed = discord.Embed(title="success", description=f"snippet '{name}' was deleted", color=0x00ff00)
+
+                await message.channel.send(embed=embed)
+            except:
+                embed = discord.Embed(title="error", description="database error", color=0xff0000)
+                await message.channel.send(embed=embed)
+        else:
+            embed = discord.Embed(title="error", description="you must specify <name>", color=0xff0000)
             await message.channel.send(embed=embed)
 
 

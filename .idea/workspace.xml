@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87617194-9a0b-4aed-8b6f-aba1c5b78e3f" name="Changes" comment="add discord.py &amp; mysql-connnetor">
-      <change afterPath="$PROJECT_DIR$/snippetbot.sql" afterDir="false" />
+    <list default="true" id="87617194-9a0b-4aed-8b6f-aba1c5b78e3f" name="Changes" comment="add events and sql database">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/snippetbot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/snippetbot.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -23,12 +24,12 @@
     &quot;assignee&quot;: &quot;LvDenu&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/LvDenu/snippetbot&quot;,
-    &quot;accountId&quot;: &quot;e793f13f-1054-4ab6-adc4-10944502aeab&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/LvDenu/snippetbot",
+    "accountId": "debab39d-6f3d-4086-b9c4-9694b8a1163b"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -44,7 +45,12 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
     "last_opened_file_path": "C:/Users/Administrator/snippetbot/snippetbot",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -89,7 +95,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1714383677924</updated>
-      <workItem from="1714467343924" duration="217000" />
+      <workItem from="1714467343924" duration="2974000" />
     </task>
     <task id="LOCAL-00001" summary="add discord.py &amp; mysql-connnetor">
       <option name="closed" value="true" />
@@ -99,7 +105,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714385216295</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add events and sql database">
+      <option name="closed" value="true" />
+      <created>1714467808261</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1714467808261</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -107,6 +121,10 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add discord.py &amp; mysql-connnetor" />
-    <option name="LAST_COMMIT_MESSAGE" value="add discord.py &amp; mysql-connnetor" />
+    <MESSAGE value="add events and sql database" />
+    <option name="LAST_COMMIT_MESSAGE" value="add events and sql database" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/snippetbot$main.coverage" NAME="main Coverage Results" MODIFIED="1714469271615" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
