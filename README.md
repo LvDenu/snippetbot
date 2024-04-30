@@ -32,5 +32,3 @@ To start the bot, simply run the `main.py` file. Make sure you have Python and t
 
 ```bash
 python main.py
-
-
