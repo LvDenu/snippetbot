@@ -1,26 +1,45 @@
+# bot.py
 import discord
-import mysql.connector
-import json
+import config
+import db
+from localization import translations
 
-##### configuration #####
-
-discordToken = "" #token from your discord application bot
-praefix = "!" # begin for your command DEFAULT: !
-
-intents = discord.Intents.default() #don´t touch
-intents.message_content = True #don´t touch
-client = discord.Client(intents=intents) #don´t touch
+intents = discord.Intents.default()
+intents.message_content = True
+client = discord.Client(intents=intents)
 
 
-mydb = mysql.connector.connect(
-    host="", #your host or IP addresse
-    user="", #your database username
-    password="", #your database password
-    database="snippetbot" #import snippetbot.sql DONT TOUCH
-)
+def get_translation(language, key):
+    lang_translations = translations.get(language, translations['en'])
+    if isinstance(lang_translations[key], dict):
+        return lang_translations[key]
+    else:
+        return lang_translations[key]
 
 
-##### events #####
+async def generate_help_embed(language="en"):
+    lang_translations = translations.get(language, translations['en'])
+
+    embed = discord.Embed(title=lang_translations.get("help_title", "Commands Help"), color=0x00ff00)
+    embed.set_thumbnail(url="https://example.com/your_image.png")
+
+    commands = [
+        ("add", "add_description"),
+        ("show", "show_description"),
+        ("delete", "delete_description"),
+        ("allsnippets", "allsnippets_description"),
+    ]
+
+    for command, description_key in commands:
+        name_translation = lang_translations.get(f"{command}_command", f"{config.praefix}{command}")
+        description_translation = lang_translations.get(description_key, "No description available.")
+
+        embed.add_field(name=name_translation, value=description_translation, inline=False)
+
+    embed.set_footer(text=lang_translations.get("help_footer", "Use these commands to manage code snippets."))
+
+    return embed
+
 
 @client.event
 async def on_ready():
@@ -31,42 +50,39 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith(f'{praefix}add'): #!add <name> <py> <snippet>
-        parts = message.content.split()
+    if message.content.startswith(f'{config.praefix}add'):
+        parts = message.content.split(
+            maxsplit=3)
         if len(parts) == 4:
             try:
-                name = (parts[1])
-                code_lang = (parts[2])
-                code = (parts[3])
-                cursor = mydb.cursor()
-
-                sql = "INSERT INTO snippets (name, code_lang, code) VALUES (%s, %s, %s)"
-                val = (name,code_lang,code)
-                cursor.execute(sql, val)
-                mydb.commit()
-                embed = discord.Embed(title="succes", description="your code was created", color=0x00ff00)
-                formatted_code = f"```{code_lang}\n{code}\n```"
-                embed.add_field(name=name, value=formatted_code, inline=False)
-                await message.channel.send(embed=embed)
+                name = parts[1]
+                code_lang = parts[2]
+                code = parts[3]
+                if db.insert_snippet(name, code_lang, code):
+                    embed = discord.Embed(title=get_translation("en", "success_title"),
+                                          description=get_translation("en", "success_description"), color=0x00ff00)
+                    formatted_code = f"```{code_lang}\n{code}\n```"
+                    embed.add_field(name=name, value=formatted_code, inline=False)
+                    await message.channel.send(embed=embed)
+                else:
+                    embed = discord.Embed(title=get_translation("en", "error_title"),
+                                          description=get_translation("en", "error_description")["db"], color=0xff0000)
+                    await message.channel.send(embed=embed)
             except:
-                embed = discord.Embed(title="error", description="database error", color=0xff0000)
+                embed = discord.Embed(title=get_translation("en", "error_title"),
+                                      description=get_translation("en", "error_description")["db"], color=0xff0000)
                 await message.channel.send(embed=embed)
         else:
-            embed = discord.Embed(title="error", description="you need <name> <code_lang> <code>", color=0xff0000)
+            embed = discord.Embed(title=get_translation("en", "error_title"),
+                                  description=get_translation("en", "error_description")["params"], color=0xff0000)
             await message.channel.send(embed=embed)
 
-    if message.content.startswith(f'{praefix}show'):  # !show <name>
+    if message.content.startswith(f'{config.praefix}show'):
         parts = message.content.split()
         if len(parts) == 2:
             try:
-                name = (parts[1])
-                cursor = mydb.cursor()
-
-                sql = "SELECT code_lang, code FROM snippets WHERE name = %s"
-                val = (name,)
-                cursor.execute(sql, val)
-                result = cursor.fetchone()
-
+                name = parts[1]
+                result = db.retrieve_snippet(name)
                 if result:
                     code_lang, code = result
                     embed = discord.Embed(title=name, color=0x00ff00)
@@ -74,41 +90,50 @@ async def on_message(message):
                     embed.description = formatted_code
                     await message.channel.send(embed=embed)
                 else:
-                    embed = discord.Embed(title="error", description="code not found", color=0xff0000)
+                    embed = discord.Embed(title=get_translation("en", "error_title"), description=get_translation("en", "error_description")["not_found"], color=0xff0000)
                     await message.channel.send(embed=embed)
             except:
-                embed = discord.Embed(title="error", description="database error", color=0xff0000)
+                embed = discord.Embed(title=get_translation("en", "error_title"), description=get_translation("en", "error_description")["db"], color=0xff0000)
                 await message.channel.send(embed=embed)
         else:
-            embed = discord.Embed(title="error", description="you need <name>", color=0xff0000)
+            embed = discord.Embed(title=get_translation("en", "error_title"), description=get_translation("en", "error_description")["not_specified"], color=0xff0000)
             await message.channel.send(embed=embed)
 
-
-    if message.content.startswith(f'{praefix}delete'):  # !delete <name>
+    if message.content.startswith(f'{config.praefix}delete'):
         parts = message.content.split()
         if len(parts) == 2:
             try:
-                name = (parts[1])
-                cursor = mydb.cursor()
-
-                sql = "DELETE FROM snippets WHERE name = %s"
-                val = (name,)
-                cursor.execute(sql, val)
-                mydb.commit()
-
-                if cursor.rowcount == 0:
-                    embed = discord.Embed(title="error", description="snippet not found", color=0xff0000)
+                name = parts[1]
+                if db.delete_snippet(name):
+                    embed = discord.Embed(title=get_translation("en", "success_title"), description=get_translation("en", "delete_success").format(name=name), color=0x00ff00)
                 else:
-                    embed = discord.Embed(title="success", description=f"snippet '{name}' was deleted", color=0x00ff00)
-
+                    embed = discord.Embed(title=get_translation("en", "error_title"), description=get_translation("en", "delete_error"), color=0xff0000)
                 await message.channel.send(embed=embed)
             except:
-                embed = discord.Embed(title="error", description="database error", color=0xff0000)
+                embed = discord.Embed(title=get_translation("en", "error_title"), description=get_translation("en", "error_description")["db"], color=0xff0000)
                 await message.channel.send(embed=embed)
         else:
-            embed = discord.Embed(title="error", description="you must specify <name>", color=0xff0000)
+            embed = discord.Embed(title=get_translation("en", "error_title"), description=get_translation("en", "error_description")["not_specified"], color=0xff0000)
             await message.channel.send(embed=embed)
 
+    if message.content.startswith(f'{config.praefix}allsnippets'):  # !showall
+        try:
+            snippet_names = db.get_all_snippet_names()
+            if snippet_names:
+                embed = discord.Embed(title=get_translation("en", "show_all_snippets_title"), color=0x00ff00)
+                embed.description = "\n".join(snippet_names)
+                await message.channel.send(embed=embed)
+            else:
+                embed = discord.Embed(title=get_translation("en", "error_title"),
+                                      description=get_translation("en", "show_all_snippets_empty"), color=0xff0000)
+                await message.channel.send(embed=embed)
+        except:
+            embed = discord.Embed(title=get_translation("en", "error_title"),
+                                  description=get_translation("en", "error_description")["db"], color=0xff0000)
+            await message.channel.send(embed=embed)
 
-##### Start ######
-client.run(discordToken)
+    if message.content.startswith(f'{config.praefix}info'):
+        help_embed = await generate_help_embed()
+        await message.channel.send(embed=help_embed)
+# start
+client.run(config.discordToken)
